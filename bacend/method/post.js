@@ -1,25 +1,48 @@
-import BodyParses from "../utils/BodyParses";
+
+// KEndi dosyamızdan helen verileri kullnamak için import ettik
+const BodyParses= require ("../utils/BodyParses")
+
+// unıq id için kullanılan kutuphane
+const crypto = require("crypto")
+// console.log(crypto)
+
+// Dosya okumak için fs methodunu kulanıyoruz
+const fs = require("fs")
 
 module.exports = async (req, res) => {
   if (req.url === "/api/movies") {
     try {
+
       // isteğin body ulas
-    const body = await BodyParses(req);
-    
+      const body = await BodyParses(req);
+      
 
-      //eskij içerik var kontrol et
+      //eski içerik var kontrol et
+      if(!body.title || !body.year || !body.rating || !body.genre || !body.genre.length>0 ){
+        res.writeHead(404)
+        res.end("Lütfen Zorunlu Alanları Doldurunuz !!!!")
+        return;
+      }
 
-      // kaydelicek file id eklennce
+      // kaydelicek file ID eklenecek  CRYPTO methodu ile
+      body.id=crypto.randomUUID();
+      // console.log(body)
 
       // json dosyasında verileri json formatınd al
+      let data = fs.readFileSync("./data/movies.json" , "utf-8");
+      //string oldugu için json parse ediyoruz
+      data = JSON.parse(data);
+      console.log(data)
+      // mevcut film uzerine ekleme
+      data.movies.push(body)
 
-      // mevcut film uzeirne ekleme
+      // json dosyasına guncelleme
+      fs.writeFileSync("./data/movies.json",JSON.stringify(data))
 
-      // json dosyasına guncelle
+      // client cevap gonderilecek
 
-      // clien cevao gonder
 
-      return res.end("Film Olsutruldu");
+      return res.end(JSON.stringify(body));
     } catch (error) {
       return res.end("Hata olsutu");
     }

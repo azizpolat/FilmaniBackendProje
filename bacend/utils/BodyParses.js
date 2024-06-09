@@ -1,19 +1,26 @@
+
+
 module.exports = (request) => {
+
   return new Promise((resolve, reject) => {
-    // fonssiyonu body tanımla
-    let body = "";
+    try {
+      // fonksiyonun göndericeği cevabı tanımla
+      let body = "";
 
-    // fronted body her parcası glsiğine  al ve yukarı değişene ekle
-    request.on("data",(chuck) => {
-        body +=chuck
-    });
+      // frontend'den body'nin her parçası geldiğinde onu al ve yukarıdaki değişkene ekle
+      request.on("data", (chunck) => {
+        body += chunck;
+      });
 
-    // yukleme bittiğinde json verisine cevirme
-    request.on("end",() => {
-
-        // fonsyonun cagrılıd yere bosy kısmını return et
-        resolve(JSON.parse(body))
-    })
-
+      // yüklenme bittiğinde json verisini js verisine çevir
+      request.on("end", () => {
+       // fonksiyonun çağrıldığı yere body kısmını return et
+        resolve(JSON.parse(body));
+        // console.log(body)
+      });
+    } catch (err) {
+      // hata oluşursa hatayı döndür
+      reject(err);
+    }
   });
 };
